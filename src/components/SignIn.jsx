@@ -1,6 +1,8 @@
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { Formik } from 'formik';
+import { useNavigate } from 'react-router-native';
 import FormikTextInput from './FormikTextInput';
+import useSignIn from '../hooks/useSignIn'
 import * as yup from 'yup';
 
 const styles = StyleSheet.create({
@@ -28,10 +30,6 @@ const styles = StyleSheet.create({
   }
 });
 
-const onSubmit = (values) => {
-  console.log('täällä');
-};
-
 const initialValues = {
   username: '',
   password: '',
@@ -43,19 +41,36 @@ const validationSchema = yup.object().shape({
 });
 
 const SignIn = () => {
+  const [signIn] = useSignIn();
+  const navigate = useNavigate()
+
+  const onSubmit = async (values) => {
+    const { username, password } = values;
+
+    try {
+      const { data } = await signIn({ username, password });
+      console.log(data);
+      navigate('/repositories')
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   return (
-    <Formik initialValues={initialValues} onPress={onSubmit} validationSchema={validationSchema}>
-      <View style={styles.container}>
-        <View style={styles.inputContainer}>
-          <FormikTextInput style={styles.inputItem} name='username' placeholder='username' />
+    <Formik initialValues={initialValues} onSubmit={onSubmit} validationSchema={validationSchema}>
+      {({ handleSubmit }) => (
+        <View style={styles.container}>
+          <View style={styles.inputContainer}>
+            <FormikTextInput style={styles.inputItem} name='username' placeholder='username' />
+          </View>
+          <View style={styles.inputContainer}>
+            <FormikTextInput style={styles.inputItem} name='password' placeholder='password' />
+          </View>
+          <Pressable onPress={handleSubmit}>
+            <Text style={styles.buttonItem}>Sign in</Text>
+          </Pressable>
         </View>
-        <View style={styles.inputContainer}>
-          <FormikTextInput style={styles.inputItem} name='password' placeholder='password' />
-        </View>
-        <Pressable onPress={onSubmit}>
-          <Text style={styles.buttonItem}>Sign in</Text>
-        </Pressable>
-      </View>
+      )}
     </Formik>
   )
 };

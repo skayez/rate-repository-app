@@ -57,7 +57,6 @@ const CountNumber = ({ number }) => {
 }
 
 const RepositoryItem = ({ item }) => {
-  console.log(item.ownerAvatarUrl)
   return (
     <View>
 
